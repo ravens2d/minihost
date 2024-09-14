@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/fxamacker/cbor"
+	"github.com/fxamacker/cbor/v2"
 	"github.com/gofrs/uuid"
 )
 

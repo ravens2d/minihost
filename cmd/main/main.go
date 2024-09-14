@@ -1,29 +1,26 @@
 package main
 
 import (
-	"context"
 	"fmt"
+	"net/http"
 
-	"github.com/redis/go-redis/v9"
+	"minihost/internal/database"
+	_ "minihost/internal/database"
+	"minihost/internal/handler"
 )
 
 func main() {
 	fmt.Println("running...")
 
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
+	mux := http.NewServeMux()
+	mux.HandleFunc("/register", handler.Register)
+	mux.HandleFunc("/login", handler.Login)
+	mux.HandleFunc("/logout", handler.Logout)
 
-	err := rdb.Set(context.Background(), "key", "something else lol", 0).Err()
+	mux.HandleFunc("/", handler.Home)
+
+	err := http.ListenAndServe(":8080", database.SessionManager.LoadAndSave(mux))
 	if err != nil {
 		panic(err)
 	}
-
-	val, err := rdb.Get(context.Background(), "key").Result()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("key", val)
 }
