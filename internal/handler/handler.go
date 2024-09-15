@@ -1,11 +1,13 @@
 package handler
 
 import (
-	"minihost/internal/database"
 	"net/http"
 	"os"
 	"path/filepath"
 	"text/template"
+
+	"minihost/internal/repository/database"
+	"minihost/internal/repository/session"
 )
 
 // Handler ...
@@ -17,13 +19,15 @@ type handler struct {
 	muxHandler http.Handler
 	templates  *template.Template
 
-	repo database.Repoistory
+	database database.Database
+	session  session.Session
 }
 
 // New ...
-func New(repo database.Repoistory) (Handler, error) {
+func New(db database.Database, s session.Session) (Handler, error) {
 	h := &handler{
-		repo: repo,
+		database: db,
+		session:  s,
 	}
 
 	h.templates = template.New("")
@@ -54,7 +58,7 @@ func New(repo database.Repoistory) (Handler, error) {
 
 	mux.HandleFunc("/", h.Home)
 
-	h.muxHandler = repo.SessionLoadAndSave(mux)
+	h.muxHandler = h.session.LoadAndSave(mux)
 
 	return h, nil
 }

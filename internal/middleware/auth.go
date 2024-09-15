@@ -1,14 +1,14 @@
 package middleware
 
 import (
-	"minihost/internal/database"
+	"minihost/internal/repository/session"
 	"net/http"
 )
 
 // RequireAuth ...
-func RequireAuth(next http.HandlerFunc, repo database.Repoistory) http.HandlerFunc {
+func RequireAuth(next http.HandlerFunc, session session.Session) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userUUID, err := repo.GetSessionAuthenticatedUserUUID(r.Context())
+		userUUID, err := session.GetAuthenticatedUserUUID(r.Context())
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

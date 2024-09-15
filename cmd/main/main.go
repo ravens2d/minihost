@@ -4,20 +4,24 @@ import (
 	"fmt"
 	"net/http"
 
-	"minihost/internal/database"
-	_ "minihost/internal/database"
 	"minihost/internal/handler"
+	"minihost/internal/repository/database"
+	"minihost/internal/repository/session"
 )
 
 func main() {
 	fmt.Println("running...")
 
-	repo, err := database.NewRepository()
+	db, err := database.New()
+	if err != nil {
+		panic(err)
+	}
+	session, err := session.New()
 	if err != nil {
 		panic(err)
 	}
 
-	h, err := handler.New(repo)
+	h, err := handler.New(db, session)
 	if err != nil {
 		panic(err)
 	}
