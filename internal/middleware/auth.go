@@ -6,10 +6,14 @@ import (
 )
 
 // RequireAuth ...
-func RequireAuth(next http.HandlerFunc) http.HandlerFunc {
+func RequireAuth(next http.HandlerFunc, repo database.Repoistory) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userUUID := database.SessionManager.GetString(r.Context(), database.UserUUIDSessionKey)
-		if userUUID == "" {
+		userUUID, err := repo.GetSessionAuthenticatedUserUUID(r.Context())
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if userUUID == nil {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}

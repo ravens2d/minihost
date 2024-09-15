@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"minihost/internal/database"
 	"minihost/internal/model"
 	"minihost/internal/util"
 	"net/http"
@@ -11,7 +10,7 @@ import (
 )
 
 // Register ...
-func Register(w http.ResponseWriter, r *http.Request) {
+func (h *handler) Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -39,7 +38,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO: better error handling for duplcaite username or email
-	err = database.CreateUser(user)
+	err = h.repo.CreateUser(user)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		util.Logger.Error(err)
@@ -47,11 +46,11 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	util.Logger.Infow("registered new user", zap.String("user_uuid", user.UUID.String()))
-	database.SessionManager.Put(r.Context(), database.UserUUIDSessionKey, user.UUID.String())
+	h.repo.AuthenticateSession(r.Context(), user)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
+func (h *handler) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -60,7 +59,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
-	user, err := database.GetUser(username)
+	user, err := h.repo.GetUser(username)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		util.Logger.Error(err)
@@ -77,11 +76,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	database.SessionManager.Put(r.Context(), database.UserUUIDSessionKey, user.UUID.String())
+	h.repo.AuthenticateSession(r.Context(), user)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func Logout(w http.ResponseWriter, r *http.Request) {
-	database.SessionManager.Destroy(r.Context())
+func (h *handler) Logout(w http.ResponseWriter, r *http.Request) {
+	h.repo.DestroySession(r.Context())
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

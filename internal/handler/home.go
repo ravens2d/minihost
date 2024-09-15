@@ -3,19 +3,21 @@ package handler
 import (
 	"fmt"
 	"io"
-	"minihost/internal/database"
 	"net/http"
 )
 
-func Home(w http.ResponseWriter, r *http.Request) {
-	userUUID := database.SessionManager.GetString(r.Context(), database.UserUUIDSessionKey)
-
-	if userUUID != "" {
-		io.WriteString(w, fmt.Sprintf("logged in as %s", userUUID))
+func (h *handler) Home(w http.ResponseWriter, r *http.Request) {
+	userUUID, err := h.repo.GetSessionAuthenticatedUserUUID(r.Context())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// io.WriteString(w, "Welcome. Please log in")
-	templates.ExecuteTemplate(w, "index.html", nil)
+	if userUUID != nil {
+		io.WriteString(w, fmt.Sprintf("logged in as %s", userUUID.String()))
+		return
+	}
+
+	h.templates.ExecuteTemplate(w, "index.html", nil)
 	return
 }

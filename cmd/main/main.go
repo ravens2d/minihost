@@ -12,18 +12,17 @@ import (
 func main() {
 	fmt.Println("running...")
 
-	mux := http.NewServeMux()
+	repo, err := database.NewRepository()
+	if err != nil {
+		panic(err)
+	}
 
-	mux.HandleFunc("/register", handler.Register)
-	mux.HandleFunc("/login", handler.Login)
-	mux.HandleFunc("/logout", handler.Logout)
+	h, err := handler.New(repo)
+	if err != nil {
+		panic(err)
+	}
 
-	fs := http.FileServer(http.Dir("static"))
-	mux.Handle("/static/", http.StripPrefix("/static/", fs))
-
-	mux.HandleFunc("/", handler.Home)
-
-	err := http.ListenAndServe(":8080", database.SessionManager.LoadAndSave(mux))
+	err = http.ListenAndServe(":8080", h)
 	if err != nil {
 		panic(err)
 	}
