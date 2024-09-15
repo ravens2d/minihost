@@ -29,9 +29,6 @@ func New(db database.Database, s session.Session) (Handler, error) {
 		session:   s,
 	}
 
-	// h.templates["index.html"] = template.Must(template.ParseFiles("template/pages/index.tmpl", "template/base.tmpl"))
-	// h.templates["register.html"] = template.Must(template.ParseFiles("template/pages/register.tmpl", "template/base.tmpl"))
-
 	err := h.registerTemplates()
 	if err != nil {
 		return nil, err

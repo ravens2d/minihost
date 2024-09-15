@@ -2,6 +2,7 @@ package handler
 
 import (
 	"minihost/internal/model"
+	"minihost/internal/repository/database"
 	"minihost/internal/util"
 	"net/http"
 	"net/mail"
@@ -38,8 +39,12 @@ func (h *handler) Register(w http.ResponseWriter, r *http.Request) {
 
 	err = h.database.CreateUser(user)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		util.Logger.Error(err)
+		if err == database.ErrDuplicateUsername || err == database.ErrDuplicateEmail {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			util.Logger.Error(err)
+		}
 		return
 	}
 
@@ -50,7 +55,7 @@ func (h *handler) Register(w http.ResponseWriter, r *http.Request) {
 
 func (h *handler) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		h.RenderTemplate(w, "login.tmpl", nil)
 		return
 	}
 

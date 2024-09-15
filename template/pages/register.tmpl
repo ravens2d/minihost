@@ -3,5 +3,10 @@
 {{ define "content" }}
     <h1>reister for minihost</h1>
     {{ template "navbar.tmpl" . }}
-    <p>here's where registeration goes</p>
+    <form action="/register" method="post">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <button type="submit">Register</button>
+    </form>
 {{ end }}
