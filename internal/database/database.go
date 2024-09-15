@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"minihost/internal/model"
 	"net/http"
 
@@ -11,8 +12,13 @@ import (
 	"github.com/gofrs/uuid"
 	redigo "github.com/gomodule/redigo/redis"
 	"github.com/jmoiron/sqlx"
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/mattn/go-sqlite3"
 	"github.com/redis/go-redis/v9"
+)
+
+var (
+	ErrDuplicateUsername = errors.New("username already in use")
+	ErrDuplicateEmail    = errors.New("email already in use")
 )
 
 const (
@@ -73,6 +79,19 @@ func (r *repository) GetUser(username string) (*model.User, error) {
 
 func (r *repository) CreateUser(user *model.User) error {
 	_, err := r.db.Exec("INSERT INTO users (uuid, username, email, password_hash) VALUES (:uuid, :username, :email, :password_hash)", user.UUID, user.Username, user.Email, user.PasswordHash)
+	if err != nil {
+		var sqliteErr sqlite3.Error
+		if errors.As(err, &sqliteErr) {
+			if sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
+				if sqliteErr.Error() == "UNIQUE constraint failed: users.username" {
+					return ErrDuplicateUsername
+				}
+				if sqliteErr.Error() == "UNIQUE constraint failed: users.email" {
+					return ErrDuplicateEmail
+				}
+			}
+		}
+	}
 	return err
 }
 
