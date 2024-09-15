@@ -13,9 +13,13 @@ func main() {
 	fmt.Println("running...")
 
 	mux := http.NewServeMux()
+
 	mux.HandleFunc("/register", handler.Register)
 	mux.HandleFunc("/login", handler.Login)
 	mux.HandleFunc("/logout", handler.Logout)
+
+	fs := http.FileServer(http.Dir("static"))
+	mux.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	mux.HandleFunc("/", handler.Home)
 

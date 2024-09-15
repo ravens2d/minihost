@@ -15,6 +15,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	io.WriteString(w, "Welcome. Please log in")
+	// io.WriteString(w, "Welcome. Please log in")
+	templates.ExecuteTemplate(w, "index.html", nil)
 	return
 }
