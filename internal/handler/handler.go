@@ -1,10 +1,8 @@
 package handler
 
 import (
+	"html/template"
 	"net/http"
-	"os"
-	"path/filepath"
-	"text/template"
 
 	"minihost/internal/repository/database"
 	"minihost/internal/repository/session"
@@ -17,7 +15,7 @@ type Handler interface {
 
 type handler struct {
 	muxHandler http.Handler
-	templates  *template.Template
+	templates  map[string]*template.Template
 
 	database database.Database
 	session  session.Session
@@ -26,25 +24,17 @@ type handler struct {
 // New ...
 func New(db database.Database, s session.Session) (Handler, error) {
 	h := &handler{
-		database: db,
-		session:  s,
+		templates: make(map[string]*template.Template),
+		database:  db,
+		session:   s,
 	}
 
-	h.templates = template.New("")
-	err := filepath.Walk("template", func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() && filepath.Ext(path) == ".html" {
-			_, err = h.templates.ParseFiles(path)
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	})
+	// h.templates["index.html"] = template.Must(template.ParseFiles("template/pages/index.tmpl", "template/base.tmpl"))
+	// h.templates["register.html"] = template.Must(template.ParseFiles("template/pages/register.tmpl", "template/base.tmpl"))
+
+	err := h.registerTemplates()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	mux := http.NewServeMux()

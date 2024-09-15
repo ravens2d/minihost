@@ -18,6 +18,6 @@ func (h *handler) Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.templates.ExecuteTemplate(w, "index.html", nil)
+	h.RenderTemplate(w, "index.tmpl", nil)
 	return
 }
