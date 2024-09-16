@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+    <head>
+        <title>minihost</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="../static/style.css" />
+    </head>
+
+    <body>
+        <header>
+            <div class="container">
+                <a href="/" class="logo">minihost</a>
+                <nav>
+                    <a href="/login">login</a>
+                    <a href="/register">register</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="container">
+            <div class="input-container">
+                <form>
+                    <div class="input-group">
+                        <label for="username">username</label>
+                        <input type="text" name="username" required />
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password">password</label>
+                        <input type="password" name="password" required />
+                    </div>
+
+                    <button type="submit">login</button>
+
+                    <div class="input-additional-actions">
+                        <a href="/register">join minihost</a> |
+                        <a href="#">forgot password?</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </body>
+</html>

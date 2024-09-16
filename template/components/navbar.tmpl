@@ -1,3 +1,13 @@
-<div>
-    here's where navbar content would go, lol
-</div>
+<header>
+    <div class="container">
+        <a href="/" class="logo">minihost</a>
+        <nav>
+            {{ if .LoggedIn }}
+                <a href="/logout">logout</a>
+            {{ else }}
+                <a href="/login">login</a>
+                <a href="/register">register</a>
+            {{ end }}
+        </nav>
+    </div>
+</header>

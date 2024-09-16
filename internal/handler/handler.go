@@ -36,9 +36,11 @@ func New(db database.Database, s session.Session) (Handler, error) {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/register", h.Register)
-	mux.HandleFunc("/login", h.Login)
-	mux.HandleFunc("/logout", h.Logout)
+	mux.HandleFunc("GET /register", h.RegisterGet)
+	mux.HandleFunc("GET /login", h.LoginGet)
+	mux.HandleFunc("POST /register", h.RegisterPost)
+	mux.HandleFunc("POST /login", h.LoginPost)
+	mux.HandleFunc("GET /logout", h.Logout)
 
 	fs := http.FileServer(http.Dir("static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))

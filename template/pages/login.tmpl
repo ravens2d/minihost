@@ -1,14 +1,24 @@
 {{ define "title" }}minihost | login{{ end }}
 
 {{ define "content" }}
-    <h1>login to minihost</h1>
+    <div class="input-container">
+        <form action="/login" method="post">
+            <div class="input-group">
+                <label for="username">username</label>
+                <input type="text" name="username" required />
+            </div>
 
-    {{ template "navbar.tmpl" . }}
+            <div class="input-group">
+                <label for="password">password</label>
+                <input type="password" name="password" required />
+            </div>
 
-    <form action="/login" method="post">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Login</button>
-    </form>
+            <button type="submit">login</button>
 
+            <div class="input-additional-actions">
+                <a href="/register">join minihost</a> |
+                <a href="#">forgot password?</a>
+            </div>
+        </form>
+    </div>
 {{ end }}

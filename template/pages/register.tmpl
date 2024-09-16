@@ -1,12 +1,28 @@
 {{ define "title" }}minihost | register{{ end }}
 
 {{ define "content" }}
-    <h1>reister for minihost</h1>
-    {{ template "navbar.tmpl" . }}
-    <form action="/register" method="post">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <input type="email" name="email" placeholder="Email" required>
-        <button type="submit">Register</button>
-    </form>
+    <div class="input-container">
+        <form action="/register" method="post">
+            <div class="input-group">
+                <label for="email">email</label>
+                <input type="email" name="email" required />
+            </div>
+
+            <div class="input-group">
+                <label for="username">username</label>
+                <input type="text" name="username" required />
+            </div>
+
+            <div class="input-group">
+                <label for="password">password</label>
+                <input type="password" name="password" required />
+            </div>
+
+            <button type="submit">register</button>
+
+            <div class="input-additional-actions">
+                <a href="/login">already have an account?</a>
+            </div>
+        </form>
+    </div>
 {{ end }}

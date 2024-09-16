@@ -2,6 +2,7 @@ package handler
 
 import (
 	"minihost/internal/model"
+	"minihost/internal/model/render"
 	"minihost/internal/repository/database"
 	"minihost/internal/util"
 	"net/http"
@@ -10,12 +11,27 @@ import (
 	"go.uber.org/zap"
 )
 
-func (h *handler) Register(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		h.RenderTemplate(w, "register.tmpl", nil)
+func (h *handler) RegisterGet(w http.ResponseWriter, r *http.Request) {
+	sessionInfo, err := render.PopulateSessionInfo(r.Context(), h.session)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	h.RenderTemplate(w, "register.tmpl", sessionInfo)
+}
+
+func (h *handler) LoginGet(w http.ResponseWriter, r *http.Request) {
+	sessionInfo, err := render.PopulateSessionInfo(r.Context(), h.session)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	h.RenderTemplate(w, "login.tmpl", sessionInfo)
+}
+
+func (h *handler) RegisterPost(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	email := r.FormValue("email")
 	password := r.FormValue("password")
@@ -53,12 +69,7 @@ func (h *handler) Register(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func (h *handler) Login(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		h.RenderTemplate(w, "login.tmpl", nil)
-		return
-	}
-
+func (h *handler) LoginPost(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 

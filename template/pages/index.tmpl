@@ -2,6 +2,10 @@
 
 {{ define "content" }}
     <h1>welcome to minihost</h1>
-    {{ template "navbar.tmpl" . }}
-    <p>please sign in</p>
+
+    {{ if .LoggedIn }}
+        <p>welcome, {{ .UserUUID }}</p>
+    {{ else }}
+        <p>please sign in</p>
+    {{ end }}
 {{ end }}
