@@ -24,3 +24,8 @@ func PopulateSessionInfo(ctx context.Context, s session.Session) (SessionInfo, e
 	}
 	return info, nil
 }
+
+type PageState struct {
+	SessionInfo
+	ErrorMessage string
+}

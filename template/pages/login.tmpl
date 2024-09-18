@@ -2,6 +2,11 @@
 
 {{ define "content" }}
     <div class="input-container">
+        {{ if .ErrorMessage }}
+            <div class="error-banner">
+                {{ .ErrorMessage }}
+            </div>
+        {{ end }}
         <form action="/login" method="post">
             <div class="input-group">
                 <label for="username">username</label>

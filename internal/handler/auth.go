@@ -18,7 +18,7 @@ func (h *handler) RegisterGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.RenderTemplate(w, "register.tmpl", sessionInfo)
+	h.RenderTemplate(w, "register.tmpl", render.PageState{SessionInfo: sessionInfo})
 }
 
 func (h *handler) LoginGet(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +28,7 @@ func (h *handler) LoginGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.RenderTemplate(w, "login.tmpl", sessionInfo)
+	h.RenderTemplate(w, "login.tmpl", render.PageState{SessionInfo: sessionInfo})
 }
 
 func (h *handler) RegisterPost(w http.ResponseWriter, r *http.Request) {
@@ -37,12 +37,16 @@ func (h *handler) RegisterPost(w http.ResponseWriter, r *http.Request) {
 	password := r.FormValue("password")
 
 	if username == "" || email == "" || password == "" {
-		http.Error(w, "Username, email, and password are required", http.StatusBadRequest)
+		h.RenderTemplate(w, "register.tmpl", render.PageState{
+			ErrorMessage: "username, email, and password are required",
+		})
 		return
 	}
 
 	if _, err := mail.ParseAddress(email); err != nil {
-		http.Error(w, "Invalid email", http.StatusBadRequest)
+		h.RenderTemplate(w, "register.tmpl", render.PageState{
+			ErrorMessage: "invalid email",
+		})
 		return
 	}
 
@@ -56,7 +60,9 @@ func (h *handler) RegisterPost(w http.ResponseWriter, r *http.Request) {
 	err = h.database.CreateUser(user)
 	if err != nil {
 		if err == database.ErrDuplicateUsername || err == database.ErrDuplicateEmail {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			h.RenderTemplate(w, "register.tmpl", render.PageState{
+				ErrorMessage: err.Error(),
+			})
 		} else {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			util.Logger.Error(err)
@@ -80,13 +86,15 @@ func (h *handler) LoginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if user == nil {
-		http.Error(w, "User not found", http.StatusBadRequest)
-		util.Logger.Error(err)
+		h.RenderTemplate(w, "login.tmpl", render.PageState{
+			ErrorMessage: "account not found",
+		})
 		return
 	}
 	if !user.VerifyPassword(password) {
-		http.Error(w, "Invalid password", http.StatusBadRequest)
-		util.Logger.Error(err)
+		h.RenderTemplate(w, "login.tmpl", render.PageState{
+			ErrorMessage: "incorrect password",
+		})
 		return
 	}
 
